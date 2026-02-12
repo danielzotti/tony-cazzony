@@ -22,28 +22,27 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { submitContactForm } from "@/app/actions"
 
-const MAX_FILE_SIZE = 5000000;
+const MAX_FILE_SIZE = 30000000;
 const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
 
 const formSchema = z.object({
     name: z.string().min(2, {
         message: "Name must be at least 2 characters.",
     }),
-    message: z.string().min(10, {
-        message: "Message must be at least 10 characters.",
-    }),
+    message: z.string().optional(),
     images: z
         .custom<FileList>()
-        .refine((files) => files?.length > 0, "Image is required.")
-        .refine((files) => Array.from(files ?? []).every((file) => file.size <= MAX_FILE_SIZE), `Max file size is 5MB.`)
+        .optional()
+        .refine((files) => !files || files.length === 0 || Array.from(files).every((file) => file.size <= MAX_FILE_SIZE), `Max file size is 30MB.`)
         .refine(
-            (files) => Array.from(files ?? []).every((file) => ACCEPTED_IMAGE_TYPES.has(file.type)),
+            (files) => !files || files.length === 0 || Array.from(files).every((file) => ACCEPTED_IMAGE_TYPES.has(file.type)),
             "Only .jpg, .jpeg, .png and .webp formats are supported."
         ),
 })
 
 export function ContactForm() {
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [fileInputKey, setFileInputKey] = useState(0)
     const { executeRecaptcha } = useGoogleReCaptcha()
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -66,7 +65,7 @@ export function ContactForm() {
 
             const formData = new FormData()
             formData.append("name", values.name)
-            formData.append("message", values.message)
+            formData.append("message", values.message || "")
             formData.append("recaptchaToken", token)
 
             if (values.images && values.images.length > 0) {
@@ -80,6 +79,7 @@ export function ContactForm() {
             if (result.success) {
                 toast.success("Submission received! Tony thanks you.")
                 form.reset()
+                setFileInputKey(prev => prev + 1)
             } else {
                 toast.error(result.message || "Something went wrong.")
             }
@@ -142,6 +142,7 @@ export function ContactForm() {
                                     <FormControl>
                                         <Input
                                             {...fieldProps}
+                                            key={fileInputKey}
                                             type="file"
                                             accept="image/*"
                                             multiple

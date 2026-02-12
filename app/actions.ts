@@ -9,9 +9,13 @@ const secretKey = process.env.RECAPTCHA_SECRET_KEY
 export async function submitContactForm(formData: FormData) {
     try {
         const name = formData.get('name') as string
-        const message = formData.get('message') as string
+        const message = (formData.get('message') as string) || ""
         const token = formData.get('recaptchaToken') as string
-        const images = formData.getAll('images') as File[]
+        const images = (formData.getAll('images') as File[]).filter(file => file.size > 0 && file.name !== 'undefined')
+
+        if (!name || name.length < 2) {
+            return { success: false, message: 'Name is mandatory and must be at least 2 characters.' }
+        }
 
         // Verify ReCaptcha
         if (!token) return { success: false, message: 'Recaptcha token missing' }
@@ -30,21 +34,19 @@ export async function submitContactForm(formData: FormData) {
         const adminSupabase = createAdminClient()
 
         for (const file of images) {
-            if (file.size > 0 && file.name !== 'undefined') {
-                const fileExt = file.name.split('.').pop()
-                const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-                const filePath = `${fileName}`
+            const fileExt = file.name.split('.').pop()
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+            const filePath = `${fileName}`
 
-                const { error: uploadError } = await adminSupabase.storage
-                    .from('contact-uploads')
-                    .upload(filePath, file)
+            const { error: uploadError } = await adminSupabase.storage
+                .from('contact-uploads')
+                .upload(filePath, file)
 
-                if (uploadError) {
-                    console.error('Upload error:', uploadError)
-                    continue
-                }
-                imageUrls.push(filePath)
+            if (uploadError) {
+                console.error('Upload error:', uploadError)
+                continue
             }
+            imageUrls.push(filePath)
         }
 
         // Insert into DB
