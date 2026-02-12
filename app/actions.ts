@@ -3,6 +3,7 @@
 import { createAdminClient } from '@/lib/supabase'
 import { setSession, clearSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 
 const secretKey = process.env.RECAPTCHA_SECRET_KEY
 
@@ -63,6 +64,7 @@ export async function submitContactForm(formData: FormData) {
             return { success: false, message: 'Failed to save submission' }
         }
 
+        revalidatePath('/')
         return { success: true, message: 'Submission received' }
     } catch (error) {
         console.error('Submission error:', error)

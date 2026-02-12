@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { submitContactForm } from "@/app/actions"
 
 const MAX_FILE_SIZE = 30000000;
@@ -40,7 +39,11 @@ const formSchema = z.object({
         ),
 })
 
-export function ContactForm() {
+interface ContactFormProps {
+    readonly onSuccess?: () => void
+}
+
+export function ContactForm({ onSuccess }: ContactFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [fileInputKey, setFileInputKey] = useState(0)
     const { executeRecaptcha } = useGoogleReCaptcha()
@@ -80,6 +83,7 @@ export function ContactForm() {
                 toast.success("Submission received! Tony thanks you.")
                 form.reset()
                 setFileInputKey(prev => prev + 1)
+                onSuccess?.()
             } else {
                 toast.error(result.message || "Something went wrong.")
             }
@@ -92,83 +96,75 @@ export function ContactForm() {
     }
 
     return (
-        <Card className="w-full max-w-lg mx-auto border-2 border-zinc-800 bg-zinc-900/50 backdrop-blur-sm text-zinc-100">
-            <CardHeader>
-                <CardTitle className="text-2xl text-center">Contact Tony</CardTitle>
-                <CardDescription className="text-center text-zinc-400">
-                    Send your best photos and messages.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Your name" {...field} className="bg-zinc-800 border-zinc-700" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="message"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Message</FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            placeholder="Write something funny..."
-                                            className="resize-none bg-zinc-800 border-zinc-700 h-32"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="images"
-                            render={({ field: { value: _value, onChange, ...fieldProps } }) => (
-                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                <FormItem>
-                                    <FormLabel>Images</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...fieldProps}
-                                            key={fileInputKey}
-                                            type="file"
-                                            accept="image/*"
-                                            multiple
-                                            className="cursor-pointer bg-zinc-800 border-zinc-700 file:text-zinc-100"
-                                            onChange={(event) => {
-                                                onChange(event.target.files)
-                                            }}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 font-bold" disabled={isSubmitting}>
-                            {isSubmitting ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Sending...
-                                </>
-                            ) : (
-                                "Send to Tony"
-                            )}
-                        </Button>
-                    </form>
-                </Form>
-            </CardContent>
-        </Card>
+        <div className="w-full text-zinc-100 p-2">
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Name</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Your name" {...field} className="bg-zinc-800 border-zinc-700" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="message"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Message</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        placeholder="Write something funny..."
+                                        className="resize-none bg-zinc-800 border-zinc-700 h-32"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="images"
+                        render={({ field: { value: _value, onChange, ...fieldProps } }) => (
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                            <FormItem>
+                                <FormLabel>Images</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...fieldProps}
+                                        key={fileInputKey}
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        className="cursor-pointer bg-zinc-800 border-zinc-700 file:text-zinc-100"
+                                        onChange={(event) => {
+                                            onChange(event.target.files)
+                                        }}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 font-bold" disabled={isSubmitting}>
+                        {isSubmitting ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Sending...
+                            </>
+                        ) : (
+                            "Send to Tony"
+                        )}
+                    </Button>
+                </form>
+            </Form>
+        </div>
     )
 }
