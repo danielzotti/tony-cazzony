@@ -47,36 +47,38 @@ export function AdminFilters() {
     }
 
     return (
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                <Input
-                    placeholder="Cerca per nome o messaggio..."
-                    value={q}
-                    onChange={(e) => setQ(e.target.value)}
-                    className="pl-10 bg-zinc-900 border-zinc-800 focus:border-orange-500/50"
-                />
-            </div>
-            <div className="w-full md:w-48">
-                <Select
-                    defaultValue={searchParams.get('visibility') || 'all'}
-                    onValueChange={handleVisibilityChange}
-                >
-                    <SelectTrigger className="bg-zinc-900 border-zinc-800 focus:ring-orange-500/50">
-                        <SelectValue placeholder="Visibilità" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
-                        <SelectItem value="all">Tutti</SelectItem>
-                        <SelectItem value="public">Pubblici</SelectItem>
-                        <SelectItem value="hidden">Nascosti</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-            {isPending && (
-                <div className="flex items-center text-xs text-zinc-500 animate-pulse">
-                    Filtraggio...
+        <div className="sticky top-0 z-40 bg-black/80 backdrop-blur-md pb-2 mb-6 pt-2">
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                    <Input
+                        placeholder="Cerca per nome o messaggio..."
+                        value={q}
+                        onChange={(e) => setQ(e.target.value)}
+                        className="pl-10 bg-zinc-900 border-zinc-800 focus:border-orange-500/50"
+                    />
                 </div>
-            )}
+                <div className="w-full md:w-48">
+                    <Select
+                        defaultValue={searchParams.get('visibility') || 'all'}
+                        onValueChange={handleVisibilityChange}
+                    >
+                        <SelectTrigger className="bg-zinc-900 border-zinc-800 focus:ring-orange-500/50">
+                            <SelectValue placeholder="Visibilità" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+                            <SelectItem value="all">Tutti</SelectItem>
+                            <SelectItem value="public">Pubblici</SelectItem>
+                            <SelectItem value="hidden">Nascosti</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                {isPending && (
+                    <div className="flex items-center text-xs text-zinc-500 animate-pulse">
+                        Filtraggio...
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

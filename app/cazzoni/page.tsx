@@ -59,7 +59,7 @@ export default async function AdminPage({
 
     return (
         <div className="min-h-screen bg-black text-zinc-100 p-8 space-y-8">
-            <div className="flex justify-between items-center bg-zinc-900 p-4 rounded-lg border border-zinc-800 sticky top-0 z-10 shadow-md">
+            <div className="flex justify-between items-center bg-zinc-900 p-4 rounded-lg border border-zinc-800 shadow-md">
                 <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-red-500">
                     Dashboard
                 </h1>
