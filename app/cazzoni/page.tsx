@@ -16,8 +16,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { SubmissionCardActions } from "@/components/admin/submission-card-actions"
 import { AdminFilters } from "@/components/admin/admin-filters"
+import { AdminPagination } from "@/components/admin/admin-pagination"
 
 export const dynamic = 'force-dynamic'
+
+const ITEMS_PER_PAGE = 10
 
 export default async function AdminPage({
     searchParams,
@@ -27,11 +30,17 @@ export default async function AdminPage({
     const params = await searchParams
     const q = (params.q as string) || ""
     const visibility = (params.visibility as string) || "all"
+    const currentPage = Number(params.page) || 1
 
     const session = await getSession()
     if (!session) return <div className="flex min-h-screen items-center justify-center bg-black bg-grid-white/[0.05] p-4"><LoginForm /></div>
 
     const supabase = createAdminClient()
+
+    // We fetch ALL submissions to filter them in memory because of the complex signed logic and text filtering
+    // BUT we will also query for the range if we wanted better performance.
+    // Given the small number of expected submissions, local filtering + slicing is more robust for now 
+    // to maintain the "Show X of Y" logic accurately with search.
 
     const { data: submissions } = await supabase.from('submissions').select('*').order('created_at', { ascending: false })
     const { data: pageViews } = await supabase.from('page_views').select('*').order('visited_at', { ascending: false })
@@ -56,6 +65,12 @@ export default async function AdminPage({
 
         return matchesQuery && matchesVisibility
     })
+
+    const totalPages = Math.ceil(filteredSubmissions.length / ITEMS_PER_PAGE)
+    const paginatedSubmissions = filteredSubmissions.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    )
 
     return (
         <div className="min-h-screen bg-black text-zinc-100 p-8 space-y-8">
@@ -113,7 +128,7 @@ export default async function AdminPage({
                 <div className="col-span-1 md:col-span-2 space-y-4">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <h2 className="text-2xl font-bold text-orange-400">Submissions</h2>
-                        <span className="text-zinc-500 text-sm">Mostrati {filteredSubmissions.length} di {allSubmissions.length}</span>
+                        <span className="text-zinc-500 text-sm">Mostrati {paginatedSubmissions.length} (Pagina {currentPage} di {totalPages})</span>
                     </div>
 
                     <AdminFilters />
@@ -125,7 +140,7 @@ export default async function AdminPage({
                     )}
 
                     <div className="grid grid-cols-1 gap-6">
-                        {filteredSubmissions.map((sub) => (
+                        {paginatedSubmissions.map((sub) => (
                             <Card key={sub.id} className="bg-zinc-900 border-zinc-800 text-zinc-100 shadow-sm hover:shadow-md transition-shadow">
                                 <CardHeader>
                                     <div className="flex justify-end">
@@ -173,6 +188,8 @@ export default async function AdminPage({
                             </Card>
                         ))}
                     </div>
+
+                    <AdminPagination currentPage={currentPage} totalPages={totalPages} />
                 </div>
             </div>
         </div>

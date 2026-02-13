@@ -5,13 +5,15 @@ import { trackPageView } from "@/app/actions"
 import { getSubmissions } from "@/lib/data"
 import { SubmissionWall } from "@/components/submission-wall"
 
+export const dynamic = 'force-dynamic'
+
 // Tracking component to handle searchParams
 async function Tracker({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const qrcode = searchParams?.qrcode
 
   if (qrcode && typeof qrcode === 'string') {
     // Fire and forget tracking
-    await trackPageView(`qrcode-${qrcode}`)
+    await trackPageView(`${qrcode}`)
   }
 
   return null
