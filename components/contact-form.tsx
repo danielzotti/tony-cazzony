@@ -122,7 +122,7 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
                             <FormItem>
                                 <FormLabel>Chi cazzo sei?</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Il tuo nomignolo" {...field} className="bg-zinc-800 border-zinc-700" />
+                                    <Input placeholder="Dimmi chi sei e ti dirò chi sei" {...field} className="bg-zinc-800 border-zinc-700" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -134,9 +134,10 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Cosa vuoi condividere?</FormLabel>
+                                <FormLabel className="text-xs"><em>(dick pick e/o profilo instagram apprezzati)</em></FormLabel>
                                 <FormControl>
                                     <Textarea
-                                        placeholder="Fai anche tu il cazzone! Scrivi qualcosa di buffo sul Wall of Shame!"
+                                        placeholder="Fai anche tu il cazzone e scrivi qualcosa sul Wall of Shame!"
                                         className="resize-none bg-zinc-800 border-zinc-700 h-32"
                                         {...field}
                                     />
@@ -151,7 +152,7 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
                         render={({ field: { value: _value, onChange, ...fieldProps } }) => (
                             // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             <FormItem>
-                                <FormLabel>Punta e scatta <em>(dick pick apprezzate)</em></FormLabel>
+                                <FormLabel>Punta e scatta</FormLabel>
                                 <FormControl>
                                     <Input
                                         {...fieldProps}
@@ -176,7 +177,7 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
                                 Sending...
                             </>
                         ) : (
-                            "INVIA"
+                            "INVIA & GODI"
                         )}
                     </Button>
                 </form>
