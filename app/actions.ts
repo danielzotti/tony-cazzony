@@ -57,7 +57,7 @@ export async function submitContactForm(formData: FormData) {
                 name,
                 message,
                 image_urls: imageUrls,
-                is_visible: false
+                is_visible: true
             })
 
         if (dbError) {
@@ -111,7 +111,7 @@ export async function deleteSubmission(id: string) {
     // 1. Get submission to find images
     const { data: submission } = await adminSupabase.from('submissions').select('image_urls').eq('id', id).single()
 
-    if (submission && submission.image_urls && submission.image_urls.length > 0) {
+    if (submission?.image_urls?.length) {
         // 2. Delete images from storage
         const { error: storageError } = await adminSupabase.storage.from('contact-uploads').remove(submission.image_urls)
         if (storageError) console.error('Error deleting images:', storageError)

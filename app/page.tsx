@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Hero } from "@/components/hero"
+import { WallHeader } from "@/components/wall-header"
 import { trackPageView } from "@/app/actions"
 import { getSubmissions } from "@/lib/data"
 import { SubmissionWall } from "@/components/submission-wall"
@@ -20,7 +21,14 @@ export default async function Home(props: {
   readonly searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const searchParams = await props.searchParams
-  const submissions = await getSubmissions()
+  const q = (searchParams.q as string) || ""
+  const allSubmissions = await getSubmissions()
+
+  const submissions = allSubmissions.filter((sub) => {
+    return !q ||
+      sub.name.toLowerCase().includes(q.toLowerCase()) ||
+      sub.message.toLowerCase().includes(q.toLowerCase())
+  })
 
   return (
     <main className="min-h-screen bg-black text-white pb-20">
@@ -29,8 +37,9 @@ export default async function Home(props: {
       </Suspense>
 
       <Hero />
+      <WallHeader />
 
-      <section className="lg:py-12 bg-zinc-950">
+      <section className="lg:py-12">
         <div className="container mx-auto px-4">
           <SubmissionWall submissions={submissions} />
         </div>

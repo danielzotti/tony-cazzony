@@ -51,6 +51,10 @@ export function SubmissionCardActions({ submission }: SubmissionCardActionsProps
         setIsToggling(false)
     }
 
+    const visibilityButtonClass = submission.is_visible
+        ? 'bg-zinc-800 text-zinc-400 hover:text-zinc-300'
+        : 'bg-orange-500/10 text-orange-400 hover:text-orange-300 border-orange-500/50'
+
     return (
         <div className="flex gap-2">
             <Button
@@ -58,7 +62,7 @@ export function SubmissionCardActions({ submission }: SubmissionCardActionsProps
                 size="sm"
                 onClick={handleToggleVisibility}
                 disabled={isToggling}
-                className={`border-zinc-700 ${submission.is_visible ? 'bg-zinc-800 text-zinc-400 hover:text-zinc-300' : 'bg-orange-500/10 text-orange-400 hover:text-orange-300 border-orange-500/50'}`}
+                className={`border-zinc-700 ${visibilityButtonClass}`}
             >
                 {isToggling ? <Loader2 className="w-4 h-4 animate-spin" /> : (
                     submission.is_visible ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />

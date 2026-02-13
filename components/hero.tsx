@@ -30,7 +30,7 @@ export function Hero() {
     }
 
     return (
-        <section className="flex flex-col items-center justify-center pt-10 px-4 bg-background text-foreground text-center space-y-8 animate-in fade-in duration-700">
+        <section className="flex flex-col items-center justify-center pt-10 px-4 text-foreground text-center space-y-8 animate-in fade-in duration-700">
             {/* Title Image */}
             <div className="relative w-full max-w-xl h-16 md:h-64 mx-2">
                 <Image
@@ -58,18 +58,17 @@ export function Hero() {
                 Muja edition!
             </h2>
 
-            <h3 className="text-3xl md:text-5xl font-extrabold uppercase text-transparent bg-gradient-to-r from-green-500 to-pink-500 drop-shadow-[0_0_10px_rgba(0,0,0,0.9)] bg-clip-text">Wall of Shame</h3>
 
             <Dialog open={isOpen} onOpenChange={handleOpenChange}>
                 <DialogTrigger asChild>
                     <Button
                         size="lg"
-                        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 lg:relative lg:bottom-0 lg:left-0 lg:-translate-x-0 bg-gradient-to-r from-amber-600 to-orange-700 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-lg px-6 py-5 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.9),0_0_20px_rgba(245,158,11,0.9)] hover:shadow-[0_15px_50px_rgba(0,0,0,0.7),0_0_30px_rgba(245,158,11,0.5)] hover:scale-105 whitespace-nowrap"
+                        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 lg:mb-4 lg:relative lg:bottom-0 lg:left-0 lg:-translate-x-0 bg-gradient-to-r from-amber-600 to-orange-700 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-lg px-6 py-5 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.9),0_0_20px_rgba(245,158,11,0.9)] hover:shadow-[0_15px_50px_rgba(0,0,0,0.7),0_0_30px_rgba(245,158,11,0.5)] hover:scale-105 whitespace-nowrap"
                     >
                         FAI SENTIRE LA TUA VOCE!
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-lg bg-zinc-950 border-zinc-800 text-zinc-100 max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-lg border-zinc-800 text-zinc-100 max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="text-center text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-orange-600">
                             Condividi la tua Muja!

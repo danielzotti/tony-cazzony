@@ -15,10 +15,19 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { SubmissionCardActions } from "@/components/admin/submission-card-actions"
+import { AdminFilters } from "@/components/admin/admin-filters"
 
 export const dynamic = 'force-dynamic'
 
-export default async function AdminPage() {
+export default async function AdminPage({
+    searchParams,
+}: {
+    readonly searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+    const params = await searchParams
+    const q = (params.q as string) || ""
+    const visibility = (params.visibility as string) || "all"
+
     const session = await getSession()
     if (!session) return <div className="flex min-h-screen items-center justify-center bg-black bg-grid-white/[0.05] p-4"><LoginForm /></div>
 
@@ -27,17 +36,26 @@ export default async function AdminPage() {
     const { data: submissions } = await supabase.from('submissions').select('*').order('created_at', { ascending: false })
     const { data: pageViews } = await supabase.from('page_views').select('*').order('visited_at', { ascending: false })
 
-    // Process images
-    const submissionsWithImages = await Promise.all((submissions || []).map(async (sub) => {
-        // image_urls is text[], stored as paths
+    // Process images and filter
+    const allSubmissions = await Promise.all((submissions || []).map(async (sub) => {
         const images = await Promise.all((sub.image_urls || []).map(async (path: string) => {
-            // Assuming path is relative to bucket root, e.g. "filename.jpg"
-            // If full URL was stored, strip query params etc. But our action stores just filename path.
             const { data } = await supabase.storage.from('contact-uploads').createSignedUrl(path, 3600)
             return data?.signedUrl
         }))
         return { ...sub, signedImages: images.filter(Boolean) as string[] }
     }))
+
+    const filteredSubmissions = allSubmissions.filter((sub) => {
+        const matchesQuery = !q ||
+            sub.name.toLowerCase().includes(q.toLowerCase()) ||
+            sub.message.toLowerCase().includes(q.toLowerCase())
+
+        const matchesVisibility = visibility === "all" ||
+            (visibility === "public" && sub.is_visible) ||
+            (visibility === "hidden" && !sub.is_visible)
+
+        return matchesQuery && matchesVisibility
+    })
 
     return (
         <div className="min-h-screen bg-black text-zinc-100 p-8 space-y-8">
@@ -81,7 +99,7 @@ export default async function AdminPage() {
                                         pageViews?.slice(0, 50).map((view) => (
                                             <TableRow key={view.id} className="border-zinc-700 hover:bg-zinc-800/50">
                                                 <TableCell>{view.source}</TableCell>
-                                                <TableCell>{new Date(view.visited_at).toLocaleString()}</TableCell>
+                                                <TableCell>{new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(view.visited_at))}</TableCell>
                                             </TableRow>
                                         ))
                                     )}
@@ -93,11 +111,21 @@ export default async function AdminPage() {
 
                 {/* Submissions */}
                 <div className="col-span-1 md:col-span-2 space-y-4">
-                    <h2 className="text-2xl font-bold text-orange-400">Submissions</h2>
-                    {submissionsWithImages?.length === 0 && <p className="text-zinc-500">No submissions yet.</p>}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <h2 className="text-2xl font-bold text-orange-400">Submissions</h2>
+                        <span className="text-zinc-500 text-sm">Mostrati {filteredSubmissions.length} di {allSubmissions.length}</span>
+                    </div>
+
+                    <AdminFilters />
+
+                    {filteredSubmissions.length === 0 && (
+                        <div className="text-center py-10 bg-zinc-900/50 rounded-lg border border-dashed border-zinc-800 text-zinc-500">
+                            Nessun post trovato con i filtri attuali.
+                        </div>
+                    )}
 
                     <div className="grid grid-cols-1 gap-6">
-                        {submissionsWithImages?.map((sub) => (
+                        {filteredSubmissions.map((sub) => (
                             <Card key={sub.id} className="bg-zinc-900 border-zinc-800 text-zinc-100 shadow-sm hover:shadow-md transition-shadow">
                                 <CardHeader>
                                     <div className="flex justify-end">
@@ -117,7 +145,7 @@ export default async function AdminPage() {
                                                     </span>
                                                 )}
                                             </div>
-                                            <CardDescription>{new Date(sub.created_at).toLocaleString()}</CardDescription>
+                                            <CardDescription>{new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(sub.created_at))}</CardDescription>
                                         </div>
 
                                     </div>

@@ -25,7 +25,8 @@ export function SubmissionWall({ submissions }: SubmissionWallProps) {
         if (!open) {
             params.delete('submission')
             const query = params.toString()
-            router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+            const url = query ? `${pathname}?${query}` : pathname
+            router.replace(url, { scroll: false })
         }
     }
 
@@ -38,7 +39,7 @@ export function SubmissionWall({ submissions }: SubmissionWallProps) {
     if (!submissions || submissions.length === 0) {
         return (
             <div className="text-center py-20 text-zinc-500">
-                <p>Non ci sono ancora dei post! Sii il primo a pubblicare sul Tony Cazzony&apos;s Wall of Shame!</p>
+                <p>Non ho trovato nulla! Clicca su "Fai sentire la tua voce e pubblica sul Tony Cazzony&apos;s Wall of Shame!</p>
             </div>
         )
     }
@@ -86,7 +87,7 @@ export function SubmissionWall({ submissions }: SubmissionWallProps) {
                                         <div className="flex justify-between items-start mb-2">
                                             <h3 className="font-bold text-white text-lg truncate pr-2">{submission.name}</h3>
                                             <span className="text-xs text-zinc-500 whitespace-nowrap pt-1">
-                                                {new Date(submission.created_at).toLocaleDateString()} {new Date(submission.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                {new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(submission.created_at))}
                                             </span>
                                         </div>
 

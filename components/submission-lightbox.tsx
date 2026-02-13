@@ -101,16 +101,7 @@ export function SubmissionLightbox({ submission, open, onOpenChange }: Submissio
                             <h2 className="text-2xl font-bold text-white mb-1">{submission?.name}</h2>
                             <p className="text-sm text-zinc-400">
                                 {submission?.created_at ? (
-                                    <>
-                                        {new Date(submission.created_at).toLocaleDateString(undefined, {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })}
-                                        <span className="ml-2 opacity-60">
-                                            {new Date(submission.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
-                                    </>
+                                    new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(submission.created_at))
                                 ) : ''}
                             </p>
                         </div>
