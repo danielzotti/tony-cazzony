@@ -18,6 +18,10 @@ export async function submitContactForm(formData: FormData) {
             return { success: false, message: 'Name is mandatory and must be at least 2 characters.' }
         }
 
+        if (!message.trim() && images.length === 0) {
+            return { success: false, message: 'Devi inserire almeno un messaggio o una foto.' }
+        }
+
         // Verify ReCaptcha
         if (!token) return { success: false, message: 'Recaptcha token missing' }
 

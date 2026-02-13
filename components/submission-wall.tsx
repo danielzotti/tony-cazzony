@@ -110,7 +110,7 @@ function SubmissionCard({ submission, onClick }: { readonly submission: Submissi
         >
             <Card className="bg-zinc-900 border-zinc-800 overflow-hidden hover:border-orange-500/50 transition-all hover:shadow-lg hover:shadow-orange-500/10">
                 <CardContent className="p-0">
-                    {submission.signedImages.length > 0 ? (
+                    {submission.signedImages.length > 0 && (
                         <div className="relative w-full aspect-[4/3] overflow-hidden">
                             <Image
                                 src={submission.signedImages[0]}
@@ -124,10 +124,6 @@ function SubmissionCard({ submission, onClick }: { readonly submission: Submissi
                                     +{submission.signedImages.length - 1}
                                 </div>
                             )}
-                        </div>
-                    ) : (
-                        <div className="w-full aspect-[4/3] bg-zinc-800/50 flex items-center justify-center p-8 text-center text-zinc-500 italic text-sm">
-                            la persona è timida e non ha inviato foto
                         </div>
                     )}
 

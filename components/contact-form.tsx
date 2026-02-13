@@ -26,7 +26,7 @@ const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "i
 
 const formSchema = z.object({
     name: z.string().min(2, {
-        message: "Name must be at least 2 characters.",
+        message: "Dammi un nome di almeno 2 caratteri.",
     }),
     message: z.string().optional(),
     images: z
@@ -35,9 +35,25 @@ const formSchema = z.object({
         .refine((files) => !files || files.length === 0 || Array.from(files).every((file) => file.size <= MAX_FILE_SIZE), `Max file size is 30MB.`)
         .refine(
             (files) => !files || files.length === 0 || Array.from(files).every((file) => ACCEPTED_IMAGE_TYPES.has(file.type)),
-            "Only .jpg, .jpeg, .png and .webp formats are supported."
+            "Formati supportati: .jpg, .jpeg, .png, .webp"
         ),
-})
+}).superRefine((data, ctx) => {
+    const hasMessage = data.message && data.message.trim().length > 0;
+    const hasImages = data.images && data.images.length > 0;
+
+    if (!hasMessage && !hasImages) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Devi inserire almeno un messaggio o una foto.",
+            path: ["message"],
+        });
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Devi inserire almeno un messaggio o una foto.",
+            path: ["images"],
+        });
+    }
+});
 
 interface ContactFormProps {
     readonly onSuccess?: () => void
@@ -80,7 +96,7 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
             const result = await submitContactForm(formData)
 
             if (result.success) {
-                toast.success("Submission received! Tony thanks you.")
+                toast.success("Messaggio ricevuto! Tony Cazzony e Muja ti ringraziano")
                 form.reset()
                 setFileInputKey(prev => prev + 1)
                 onSuccess?.()
