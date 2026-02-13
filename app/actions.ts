@@ -103,3 +103,80 @@ export async function logoutAdmin() {
     await clearSession()
     redirect('/cazzoni')
 }
+
+export async function deleteSubmission(id: string) {
+    const adminSupabase = createAdminClient()
+
+    // 1. Get submission to find images
+    const { data: submission } = await adminSupabase.from('submissions').select('image_urls').eq('id', id).single()
+
+    if (submission && submission.image_urls && submission.image_urls.length > 0) {
+        // 2. Delete images from storage
+        const { error: storageError } = await adminSupabase.storage.from('contact-uploads').remove(submission.image_urls)
+        if (storageError) console.error('Error deleting images:', storageError)
+    }
+
+    // 3. Delete record
+    const { error } = await adminSupabase.from('submissions').delete().eq('id', id)
+
+    if (error) {
+        console.error('Error deleting submission:', error)
+        return { success: false, message: 'Failed to delete submission' }
+    }
+
+    revalidatePath('/cazzoni')
+    revalidatePath('/')
+    return { success: true }
+}
+
+export async function updateSubmission(id: string, formData: FormData) {
+    const name = formData.get('name') as string
+    const message = formData.get('message') as string
+
+    if (!name || name.length < 2) {
+        return { success: false, message: 'Name must be at least 2 characters' }
+    }
+
+    const adminSupabase = createAdminClient()
+    const { error } = await adminSupabase.from('submissions').update({ name, message }).eq('id', id)
+
+    if (error) {
+        console.error('Error updating submission:', error)
+        return { success: false, message: 'Failed to update submission' }
+    }
+
+    revalidatePath('/cazzoni')
+    revalidatePath('/')
+    return { success: true }
+}
+
+export async function deleteSubmissionImage(id: string, imagePath: string) {
+    const adminSupabase = createAdminClient()
+
+    // 1. Get current images
+    const { data: submission } = await adminSupabase.from('submissions').select('image_urls').eq('id', id).single()
+
+    if (!submission) return { success: false, message: 'Submission not found' }
+
+    const newImages = (submission.image_urls || []).filter((url: string) => url !== imagePath)
+
+    // 2. Update DB
+    const { error: dbError } = await adminSupabase.from('submissions').update({ image_urls: newImages }).eq('id', id)
+
+    if (dbError) {
+        console.error('Error updating images in DB:', dbError)
+        return { success: false, message: 'Failed to update submission images' }
+    }
+
+    // 3. Delete from storage
+    const { error: storageError } = await adminSupabase.storage.from('contact-uploads').remove([imagePath])
+
+    if (storageError) {
+        console.error('Error deleting image file:', storageError)
+        // We don't return failure here because DB is already updated
+    }
+
+    revalidatePath('/cazzoni')
+    revalidatePath('/')
+    return { success: true }
+}

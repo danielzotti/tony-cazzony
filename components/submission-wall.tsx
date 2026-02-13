@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import Image from 'next/image'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Submission } from '@/lib/data'
 import { Card, CardContent } from '@/components/ui/card'
 import { SubmissionLightbox } from './submission-lightbox'
@@ -11,12 +12,27 @@ interface SubmissionWallProps {
 }
 
 export function SubmissionWall({ submissions }: SubmissionWallProps) {
-    const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
-    const [lightboxOpen, setLightboxOpen] = useState(false)
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
+
+    const selectedId = searchParams.get('submission')
+    const selectedSubmission = submissions.find(s => s.id === selectedId) || null
+    const lightboxOpen = !!selectedSubmission
+
+    const handleOpenChange = (open: boolean) => {
+        const params = new URLSearchParams(searchParams.toString())
+        if (!open) {
+            params.delete('submission')
+            const query = params.toString()
+            router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+        }
+    }
 
     const handleSubmissionClick = (submission: Submission) => {
-        setSelectedSubmission(submission)
-        setLightboxOpen(true)
+        const params = new URLSearchParams(searchParams.toString())
+        params.set('submission', submission.id)
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
     }
 
     if (!submissions || submissions.length === 0) {
@@ -60,8 +76,8 @@ export function SubmissionWall({ submissions }: SubmissionWallProps) {
                                             )}
                                         </div>
                                     ) : (
-                                        <div className="w-full aspect-[4/3] bg-zinc-800 flex items-center justify-center text-zinc-600">
-                                            No Image
+                                        <div className="w-full aspect-[4/3] bg-zinc-800/50 flex items-center justify-center p-8 text-center text-zinc-500 italic text-sm">
+                                            la persona è timida e non ha inviato foto
                                         </div>
                                     )}
 
@@ -70,7 +86,7 @@ export function SubmissionWall({ submissions }: SubmissionWallProps) {
                                         <div className="flex justify-between items-start mb-2">
                                             <h3 className="font-bold text-white text-lg truncate pr-2">{submission.name}</h3>
                                             <span className="text-xs text-zinc-500 whitespace-nowrap pt-1">
-                                                {new Date(submission.created_at).toLocaleDateString()}
+                                                {new Date(submission.created_at).toLocaleDateString()} {new Date(submission.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                         </div>
 
@@ -90,7 +106,7 @@ export function SubmissionWall({ submissions }: SubmissionWallProps) {
             <SubmissionLightbox
                 submission={selectedSubmission}
                 open={lightboxOpen}
-                onOpenChange={setLightboxOpen}
+                onOpenChange={handleOpenChange}
             />
         </>
     )

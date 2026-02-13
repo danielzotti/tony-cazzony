@@ -104,9 +104,9 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Name</FormLabel>
+                                <FormLabel>Chi cazzo sei?</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Your name" {...field} className="bg-zinc-800 border-zinc-700" />
+                                    <Input placeholder="Il tuo nomignolo" {...field} className="bg-zinc-800 border-zinc-700" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -117,10 +117,10 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
                         name="message"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Message</FormLabel>
+                                <FormLabel>Cosa vuoi condividere?</FormLabel>
                                 <FormControl>
                                     <Textarea
-                                        placeholder="Write something funny..."
+                                        placeholder="Fai anche tu il cazzone: scrivi qualcosa di buffo!"
                                         className="resize-none bg-zinc-800 border-zinc-700 h-32"
                                         {...field}
                                     />
@@ -135,7 +135,7 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
                         render={({ field: { value: _value, onChange, ...fieldProps } }) => (
                             // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             <FormItem>
-                                <FormLabel>Images</FormLabel>
+                                <FormLabel>Punta e scatta <em>(dick pick apprezzate)</em></FormLabel>
                                 <FormControl>
                                     <Input
                                         {...fieldProps}
@@ -160,7 +160,7 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
                                 Sending...
                             </>
                         ) : (
-                            "Send to Tony"
+                            "INVIA"
                         )}
                     </Button>
                 </form>

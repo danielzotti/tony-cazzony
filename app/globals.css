@@ -121,8 +121,14 @@
     @apply border-border outline-ring/50;
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
     @apply bg-background text-foreground;
   }
+}
+
+.grecaptcha-badge {
+  transform: scale(0.7);
+  transform-origin: bottom right;
 }

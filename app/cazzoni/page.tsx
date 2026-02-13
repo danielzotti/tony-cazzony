@@ -3,6 +3,7 @@ import { LoginForm } from "./login-form"
 import { createAdminClient } from "@/lib/supabase"
 import { logoutAdmin } from "@/app/actions"
 import Image from "next/image"
+import Link from "next/link"
 import {
     Table,
     TableBody,
@@ -11,8 +12,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { SubmissionCardActions } from "@/components/admin/submission-card-actions"
 
 export const dynamic = 'force-dynamic'
 
@@ -41,11 +43,19 @@ export default async function AdminPage() {
         <div className="min-h-screen bg-black text-zinc-100 p-8 space-y-8">
             <div className="flex justify-between items-center bg-zinc-900 p-4 rounded-lg border border-zinc-800 sticky top-0 z-10 shadow-md">
                 <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-red-500">
-                    Tony&apos;s Dashboard
+                    Dashboard
                 </h1>
                 <form action={logoutAdmin}>
                     <Button variant="destructive">Logout</Button>
                 </form>
+            </div>
+
+            <div className="flex justify-start">
+                <Link href="/">
+                    <Button variant="outline" className="border-orange-500/50 text-orange-400 hover:bg-orange-500/10 hover:text-orange-300">
+                        ← Torna al Wall
+                    </Button>
+                </Link>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -90,10 +100,16 @@ export default async function AdminPage() {
                         {submissionsWithImages?.map((sub) => (
                             <Card key={sub.id} className="bg-zinc-900 border-zinc-800 text-zinc-100 shadow-sm hover:shadow-md transition-shadow">
                                 <CardHeader>
-                                    <CardTitle className="flex justify-between items-start flex-wrap gap-2">
-                                        <span className="font-bold text-lg text-white">{sub.name}</span>
-                                        <span className="text-sm font-normal text-zinc-500">{new Date(sub.created_at).toLocaleString()}</span>
-                                    </CardTitle>
+                                    <div className="flex justify-end">
+                                        <SubmissionCardActions submission={sub} />
+                                    </div>
+                                    <div className="flex justify-between items-start gap-4">
+                                        <div className="space-y-1">
+                                            <CardTitle className="text-lg font-bold text-white">{sub.name}</CardTitle>
+                                            <CardDescription>{new Date(sub.created_at).toLocaleString()}</CardDescription>
+                                        </div>
+
+                                    </div>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="bg-zinc-950 p-4 rounded-md border border-zinc-800">
