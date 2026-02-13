@@ -45,6 +45,14 @@ export default async function AdminPage({
     const { data: submissions } = await supabase.from('submissions').select('*').order('created_at', { ascending: false })
     const { data: pageViews } = await supabase.from('page_views').select('*').order('visited_at', { ascending: false })
 
+    // Group page views by source
+    const viewsBySource = (pageViews || []).reduce((acc: Record<string, number>, view) => {
+        acc[view.source] = (acc[view.source] || 0) + 1
+        return acc
+    }, {})
+
+    const sortedSources = Object.entries(viewsBySource).sort((a, b) => b[1] - a[1])
+
     // Process images and filter
     const allSubmissions = await Promise.all((submissions || []).map(async (sub) => {
         const images = await Promise.all((sub.image_urls || []).map(async (path: string) => {
@@ -96,30 +104,52 @@ export default async function AdminPage({
                     <CardHeader>
                         <CardTitle className="text-xl text-orange-400">Visitor Analytics (Total: {pageViews?.length || 0})</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div className="max-h-60 overflow-y-auto">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow className="border-zinc-700 hover:bg-zinc-800/50">
-                                        <TableHead className="text-zinc-400">Source</TableHead>
-                                        <TableHead className="text-zinc-400">Time</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {(pageViews || []).length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={2} className="text-center text-zinc-500">No views yet.</TableCell>
+                    <CardContent className="space-y-6">
+                        {/* Summary by Source */}
+                        <div className="space-y-2">
+                            <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">Count per Source</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {sortedSources.map(([source, count]) => (
+                                    <div key={source} className="bg-zinc-950 p-3 rounded-md border border-zinc-800">
+                                        <div className="text-xs text-zinc-500 mb-1 truncate" title={source}>{source}</div>
+                                        <div className="text-xl font-bold text-white">{count}</div>
+                                    </div>
+                                ))}
+                                {sortedSources.length === 0 && (
+                                    <div className="col-span-full text-zinc-500 italic text-sm">Nessun dato disponibile</div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Recent Activity */}
+                        <div className="space-y-2">
+                            <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">Recent Activity (Last 50)</h3>
+                            <div className="max-h-60 overflow-y-auto border border-zinc-800 rounded-md">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="border-zinc-700 hover:bg-zinc-800/50">
+                                            <TableHead className="text-zinc-400">Source</TableHead>
+                                            <TableHead className="text-zinc-400 text-right">Time</TableHead>
                                         </TableRow>
-                                    ) : (
-                                        pageViews?.slice(0, 50).map((view) => (
-                                            <TableRow key={view.id} className="border-zinc-700 hover:bg-zinc-800/50">
-                                                <TableCell>{view.source}</TableCell>
-                                                <TableCell>{new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(view.visited_at))}</TableCell>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {(pageViews || []).length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={2} className="text-center text-zinc-500">No views yet.</TableCell>
                                             </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
+                                        ) : (
+                                            pageViews?.slice(0, 50).map((view) => (
+                                                <TableRow key={view.id} className="border-zinc-700 hover:bg-zinc-800/50">
+                                                    <TableCell className="font-medium">{view.source}</TableCell>
+                                                    <TableCell className="text-right text-zinc-400">
+                                                        {new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(view.visited_at))}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
