@@ -7,6 +7,7 @@ export interface Submission {
     created_at: string
     image_urls: string[] // original paths
     signedImages: string[] // signed urls
+    is_visible: boolean
 }
 
 export async function getSubmissions(): Promise<Submission[]> {
@@ -15,6 +16,7 @@ export async function getSubmissions(): Promise<Submission[]> {
     const { data: submissions, error } = await supabase
         .from('submissions')
         .select('*')
+        .eq('is_visible', true)
         .order('created_at', { ascending: false })
 
     if (error) {

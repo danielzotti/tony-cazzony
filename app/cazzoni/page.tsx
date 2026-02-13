@@ -105,7 +105,18 @@ export default async function AdminPage() {
                                     </div>
                                     <div className="flex justify-between items-start gap-4">
                                         <div className="space-y-1">
-                                            <CardTitle className="text-lg font-bold text-white">{sub.name}</CardTitle>
+                                            <div className="flex items-center gap-3">
+                                                <CardTitle className="text-lg font-bold text-white">{sub.name}</CardTitle>
+                                                {sub.is_visible ? (
+                                                    <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 text-[10px] font-bold uppercase tracking-wider border border-green-500/20">
+                                                        Public
+                                                    </span>
+                                                ) : (
+                                                    <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-500 text-[10px] font-bold uppercase tracking-wider border border-zinc-700">
+                                                        Hidden
+                                                    </span>
+                                                )}
+                                            </div>
                                             <CardDescription>{new Date(sub.created_at).toLocaleString()}</CardDescription>
                                         </div>
 

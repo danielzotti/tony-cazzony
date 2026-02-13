@@ -56,7 +56,8 @@ export async function submitContactForm(formData: FormData) {
             .insert({
                 name,
                 message,
-                image_urls: imageUrls
+                image_urls: imageUrls,
+                is_visible: false
             })
 
         if (dbError) {
@@ -174,6 +175,20 @@ export async function deleteSubmissionImage(id: string, imagePath: string) {
     if (storageError) {
         console.error('Error deleting image file:', storageError)
         // We don't return failure here because DB is already updated
+    }
+
+    revalidatePath('/cazzoni')
+    revalidatePath('/')
+    return { success: true }
+}
+
+export async function toggleSubmissionVisibility(id: string, isVisible: boolean) {
+    const adminSupabase = createAdminClient()
+    const { error } = await adminSupabase.from('submissions').update({ is_visible: isVisible }).eq('id', id)
+
+    if (error) {
+        console.error('Error toggling visibility:', error)
+        return { success: false, message: 'Failed to update visibility' }
     }
 
     revalidatePath('/cazzoni')

@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Trash2, Loader2 } from "lucide-react"
-import { deleteSubmission } from "@/app/actions"
+import { Trash2, Loader2, Eye, EyeOff } from "lucide-react"
+import { deleteSubmission, toggleSubmissionVisibility } from "@/app/actions"
 import { toast } from "sonner"
 import { EditSubmissionDialog } from "./edit-submission-dialog"
 
@@ -14,6 +14,7 @@ interface Submission {
     image_urls: string[]
     signedImages: string[]
     created_at: string
+    is_visible: boolean
 }
 
 interface SubmissionCardActionsProps {
@@ -22,6 +23,7 @@ interface SubmissionCardActionsProps {
 
 export function SubmissionCardActions({ submission }: SubmissionCardActionsProps) {
     const [isDeleting, setIsDeleting] = useState(false)
+    const [isToggling, setIsToggling] = useState(false)
 
     const handleDelete = async () => {
         if (!confirm("Are you sure you want to delete this submission? This cannot be undone.")) return
@@ -37,8 +39,33 @@ export function SubmissionCardActions({ submission }: SubmissionCardActionsProps
         }
     }
 
+    const handleToggleVisibility = async () => {
+        setIsToggling(true)
+        const result = await toggleSubmissionVisibility(submission.id, !submission.is_visible)
+
+        if (result.success) {
+            toast.success(submission.is_visible ? "Submission hidden" : "Submission published")
+        } else {
+            toast.error(result.message || "Failed to update visibility")
+        }
+        setIsToggling(false)
+    }
+
     return (
         <div className="flex gap-2">
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={handleToggleVisibility}
+                disabled={isToggling}
+                className={`border-zinc-700 ${submission.is_visible ? 'bg-zinc-800 text-zinc-400 hover:text-zinc-300' : 'bg-orange-500/10 text-orange-400 hover:text-orange-300 border-orange-500/50'}`}
+            >
+                {isToggling ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                    submission.is_visible ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />
+                )}
+                {submission.is_visible ? "Hide" : "Show"}
+            </Button>
+
             <EditSubmissionDialog submission={submission} />
 
             <Button
