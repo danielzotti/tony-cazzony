@@ -30,7 +30,7 @@ export default async function Home(props: {
 
       <Hero />
 
-      <section className="py-12 bg-zinc-950">
+      <section className="lg:py-12 bg-zinc-950">
         <div className="container mx-auto px-4">
           <SubmissionWall submissions={submissions} />
         </div>

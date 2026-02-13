@@ -120,7 +120,7 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
                                 <FormLabel>Cosa vuoi condividere?</FormLabel>
                                 <FormControl>
                                     <Textarea
-                                        placeholder="Fai anche tu il cazzone: scrivi qualcosa di buffo!"
+                                        placeholder="Fai anche tu il cazzone! Scrivi qualcosa di buffo sul Wall of Shame!"
                                         className="resize-none bg-zinc-800 border-zinc-700 h-32"
                                         {...field}
                                     />

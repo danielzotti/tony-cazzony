@@ -38,7 +38,7 @@ export function SubmissionWall({ submissions }: SubmissionWallProps) {
     if (!submissions || submissions.length === 0) {
         return (
             <div className="text-center py-20 text-zinc-500">
-                <p>No submissions yet. Be the first to join Tony&apos;s Wall!</p>
+                <p>Non ci sono ancora dei post! Sii il primo a pubblicare sul Tony Cazzony&apos;s Wall of Shame!</p>
             </div>
         )
     }
